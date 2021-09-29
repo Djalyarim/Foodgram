@@ -1,0 +1,4 @@
+/media/
+/static/
+*.sqlite3
+*Dockerfile
