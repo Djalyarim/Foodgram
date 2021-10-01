@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F
+
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from users.serializers import CustomUserSerializer
 
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingList, Tag)
 
 User = get_user_model()
@@ -31,7 +32,7 @@ class ShowRecipeIngredientsSerializer(serializers.ModelSerializer):
                        source='ingredient.measurement_unit')
 
     class Meta:
-        model = RecipeIngredients
+        model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
@@ -49,7 +50,7 @@ class ShowRecipeFullSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart')
 
     def get_ingredients(self, obj):
-        ingredients = RecipeIngredients.objects.filter(recipe=obj)
+        ingredients = RecipeIngredient.objects.filter(recipe=obj)
         return ShowRecipeIngredientsSerializer(ingredients, many=True).data
 
     def get_is_favorited(self, obj):
@@ -71,7 +72,7 @@ class AddRecipeIngredientsSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField()
 
     class Meta:
-        model = RecipeIngredients
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 
@@ -90,7 +91,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, data):
         ingredients = self.initial_data.get('ingredients')
-        if ingredients == []:
+        if not ingredients:
             raise ValidationError('Нужно выбрать минимум 1 ингридиент!')
         for ingredient in ingredients:
             if int(ingredient['amount']) <= 0:
@@ -103,17 +104,6 @@ class AddRecipeSerializer(serializers.ModelSerializer):
                                   ' отрицательным числом или нулем!')
         return data
 
-    def ingredients_recipe(self, ingredients, recipe):
-        for ingredient in ingredients:
-            ingredient_id = ingredient['id']
-            amount = ingredient['amount']
-            if RecipeIngredients.objects.\
-               filter(recipe=recipe, ingredient=ingredient_id).exists():
-                amount += F('amount')
-            RecipeIngredients.objects.update_or_create(
-                recipe=recipe, ingredient=ingredient_id,
-                defaults={'amount': amount})
-
     def create(self, validated_data):
         author = self.context.get('request').user
         tags_data = validated_data.pop('tags')
@@ -122,6 +112,18 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         self.ingredients_recipe(ingredients_data, recipe)
         recipe.tags.set(tags_data)
         return recipe
+
+    def ingredients_recipe(self, ingredients, recipe):
+        for ingredient in ingredients:
+            ingredient_id = ingredient['id']
+            amount = ingredient['amount']
+            if RecipeIngredient.objects.filter(
+                recipe=recipe, ingredient=ingredient_id
+            ).exists():
+                amount += F('amount')
+            RecipeIngredient.objects.update_or_create(
+                recipe=recipe, ingredient=ingredient_id,
+                defaults={'amount': amount})
 
     def update(self, recipe, validated_data):
         recipe.name = validated_data.get('name', recipe.name)

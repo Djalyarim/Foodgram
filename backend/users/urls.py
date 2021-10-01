@@ -1,4 +1,5 @@
 from django.urls import include, path
+
 from djoser import views
 
 from users.views import FollowApiView, ListFollowViewSet

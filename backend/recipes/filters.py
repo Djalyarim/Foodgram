@@ -16,7 +16,7 @@ class RecipeFilter(filters.FilterSet):
                                          label='Favourited')
     is_in_shopping_cart = filters.BooleanFilter(method='get_shopping',
                                                 label='Is in shopping list')
-    tags = filters.AllValuesMultipleFilter(field_name='recipetags__tag__slug',
+    tags = filters.AllValuesMultipleFilter(field_name='recipetag__tag__slug',
                                            label='Tags')
 
     class Meta:
