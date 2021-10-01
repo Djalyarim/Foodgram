@@ -56,22 +56,22 @@ TEMPLATES = [
 AUTH_USER_MODEL = 'users.CustomUser'
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('ENGINE', default='django.db.backends.postgresql'),
-#         'NAME': os.environ.get('NAME', default='postgres'),
-#         'USER': os.environ.get('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': os.environ.get('DB_HOST', default='db'),
-#         'PORT': os.environ.get('DB_PORT', default=5432)
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.environ.get('ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.environ.get('NAME', default='postgres'),
+        'USER': os.environ.get('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.environ.get('DB_HOST', default='db'),
+        'PORT': os.environ.get('DB_PORT', default=5432)
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
