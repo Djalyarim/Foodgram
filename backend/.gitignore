@@ -3,3 +3,4 @@
 *.sqlite3
 *Dockerfile
 setup.cfg
+.DS_Store
