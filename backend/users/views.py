@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from foodgram.pagination import CustomPaginator
-
 from .models import Follow
 from .serializers import FollowUserSerializer, FollowViewSerializer
 

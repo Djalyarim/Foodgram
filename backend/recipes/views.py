@@ -1,5 +1,4 @@
 from django.db.models import Sum
-from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,7 +7,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from foodgram.pagination import CustomPaginator
-
 from .filters import IngredientsFilter, RecipeFilter
 from .mixins import RetriveAndListViewSet
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
@@ -17,6 +15,7 @@ from .permissions import IsAuthorOrAdmin
 from .serializers import (AddRecipeSerializer, FavouriteSerializer,
                           IngredientsSerializer, ShoppingListSerializer,
                           ShowRecipeFullSerializer, TagsSerializer)
+from .utils import download_file_response
 
 
 class IngredientsViewSet(RetriveAndListViewSet):
@@ -99,9 +98,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f'{ingredient["ingredient__measurement_unit"]} \n'
             )
         return download_file_response(ingredients_list, 'to_buy.txt')
-
-
-def download_file_response(list_to_download, filename):
-    response = HttpResponse(list_to_download, 'Content-Type: text/plain')
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return response
+    
