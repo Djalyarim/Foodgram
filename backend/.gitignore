@@ -1,5 +1,4 @@
 /media/
 /static/
-*.sqlite3
 setup.cfg
 .DS_Store
