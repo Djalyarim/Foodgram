@@ -1,6 +1,6 @@
 /media/
 /static/
 *.sqlite3
-*Dockerfile
+Dockerfile
 setup.cfg
 .DS_Store
