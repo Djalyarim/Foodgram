@@ -98,4 +98,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f'{ingredient["ingredient__measurement_unit"]} \n'
             )
         return download_file_response(ingredients_list, 'to_buy.txt')
-    
