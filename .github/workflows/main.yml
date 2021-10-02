@@ -28,7 +28,7 @@ jobs:
         with:
           push: true
           context: backend/
-          tags: viktrols/foodgram:latest
+          tags: djalyarim/foodgram-backend:latest
 
   deploy:
     if: github.ref == 'refs/heads/master'
@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker pull viktrols/foodgram:latest
+            sudo docker pull djalyarim/foodgram-backend:latest
             sudo docker-compose stop
             sudo docker-compose rm backend
             sudo docker-compose -f docker-compose.yml up -d
@@ -58,4 +58,4 @@ jobs:
       with:
         to: ${{ secrets.TG_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: ${{ github.workflow }} выполнен! Ура!!!
+        message: ${{ github.workflow }} выполнен!
