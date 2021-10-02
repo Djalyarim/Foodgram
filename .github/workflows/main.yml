@@ -1,0 +1,61 @@
+name: backend
+
+on:
+  push:
+    branches:
+      - "**"
+    paths-ignore:
+      - '**/README.md'
+      - '**/docker-compose.yml'
+
+jobs:
+  build_and_push_to_docker_hub:
+    if: github.ref == 'refs/heads/master'
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker 
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: backend/
+          tags: viktrols/foodgram:latest
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
+    steps:
+      - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            sudo docker pull viktrols/foodgram:latest
+            sudo docker-compose stop
+            sudo docker-compose rm backend
+            sudo docker-compose -f docker-compose.yml up -d
+  
+  send_message:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: Telegram notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TG_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: ${{ github.workflow }} выполнен! Ура!!!
